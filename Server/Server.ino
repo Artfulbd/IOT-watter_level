@@ -1,4 +1,5 @@
 #include <ESP8266WiFi.h>
+#include <ArduinoJson.h>
 
 //////////////////////
 // WiFi Definitions //
@@ -7,6 +8,10 @@ const char WiFiAPPSK[] = "sparkfun";
 IPAddress local_IP(10,10,10,22);
 IPAddress gateway(10,10,10,1);
 IPAddress subnet(255,255,255,0);
+
+// Replace with your unique URL resource
+const char* resource = "/boloKiKhobor";
+
 
 /////////////////////
 // Pin Definitions //
@@ -50,66 +55,25 @@ void loop()
   Serial.println(req);
   client.flush();
 
-  // Match the request
-  int val = -1; // We'll use 'val' to keep track of both the
-                // request type (read/set) and value if set.
-  if (req.indexOf("/led/0") != -1)
-    val = 0; // Will write LED low
-  else if (req.indexOf("/led/1") != -1)
-    val = 1; // Will write LED high
-  else if (req.indexOf("/read") != -1)
-    val = -2; // Will print pin reads
-  // Otherwise request will be invalid. We'll say as much in HTML
-
-  // Set GPIO5 according to the request
-  if (val >= 0)
-    digitalWrite(LED_PIN, val);
-
-  client.flush();
-
-  // Prepare the response. Start with the common header:
+  // Reserve memory space for your JSON data
+  StaticJsonDocument<200> doc;
   String s = "HTTP/1.1 200 OK\r\n";
-  s += "Content-Type: text/html\r\n\r\n";
-  s += "<!DOCTYPE HTML>\r\n<html>\r\n";
-
-  /*Note: Uncomment the line below to refresh automatically
-   *      for every 1 second. This is not ideal for large pages 
-   *      but for a simple read out, it is useful for monitoring 
-   *      your sensors and I/O pins. To adjust the fresh rate, 
-   *      adjust the value for content. For 30 seconds, simply 
-   *      change the value to 30.*/
-  //s += "<meta http-equiv='refresh' content='1'/>\r\n";//auto refresh page
-
-  // If we're setting the LED, print out a message saying we did
-  if (val >= 0)
-  {
-    s += "LED is now ";
-    s += (val)?"on":"off";
-  }
-  else if (val == -2)
-  { // If we're reading pins, print out those values:
-    s += "Analog Pin = ";
-    s += String(analogRead(ANALOG_PIN));
-    s += "<br>"; // Go to the next line.
-    s += "Digital Pin 12 = ";
-    s += String(digitalRead(DIGITAL_PIN));
-  }
-  else
-  {
-    s += "Invalid Request.<br> Try /led/1, /led/0, or /read.";
-    s += "Distance in inch ";
-    s += lowerTankDistanceCm();
-  }
-  s += "</html>\n";
-
-  // Send the response to the client
+  s += "Content-Type: application/json\r\n\r\n";
   client.print(s);
-  delay(1);
+  if (req.indexOf(resource) != -1)
+  {
+    doc["test1"] = lowerTankDistanceCm();
+    doc["test2"] = lowerTankDistanceCm();
+    serializeJson(doc, client);
+  }
+  else{
+    doc["your_name"] = "bolod";
+    serializeJson(doc, client);
+  }
+  serializeJson(doc, Serial);
   Serial.println("Client disonnected");
-
-  // The client will actually be disconnected 
-  // when the function returns and 'client' object is detroyed
 }
+
 
 void setupWiFi()
 {
