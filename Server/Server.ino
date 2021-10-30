@@ -13,9 +13,22 @@ IPAddress subnet(255,255,255,0);
 /////////////////////
 const int LED_PIN = 5; // Thing's onboard, green LED
 const int ANALOG_PIN = A0; // The only analog pin on the Thing
-const int DIGITAL_PIN = 12; // Digital pin to be read
+const int DIGITAL_PIN = 9; // Digital pin to be read
 
 WiFiServer server(80);
+
+/* Ultrasonic start */
+const int trigPin = 12;
+const int echoPin = 14;
+
+//define sound velocity in cm/uS
+#define SOUND_VELOCITY 0.034
+#define CM_TO_INCH 0.393701
+
+long duration;
+float distanceCm;
+float distanceInch;
+/* Ultrasonic end */
 
 void setup() 
 {
@@ -84,6 +97,8 @@ void loop()
   else
   {
     s += "Invalid Request.<br> Try /led/1, /led/0, or /read.";
+    s += "Distance in inch ";
+    s += lowerTankDistanceCm();
   }
   s += "</html>\n";
 
@@ -122,9 +137,38 @@ void setupWiFi()
   //WiFi.softAP(const char* ssid, const char* password, int channel, int ssid_hidden, int max_connection)
 }
 
+float lowerTankDistanceCm(){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPin, HIGH);
+  
+  // Calculate the distance
+  distanceCm = duration * SOUND_VELOCITY/2;
+  
+  // Convert to inches
+  distanceInch = distanceCm * CM_TO_INCH;
+  
+  // Prints the distance on the Serial Monitor
+  Serial.print("Distance (cm): ");
+  Serial.println(distanceCm);
+  Serial.print("Distance (inch): ");
+  Serial.println(distanceInch);
+  return distanceCm;
+  //delay(1000);
+}
+
 void initHardware()
 {
   Serial.begin(115200);
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+  
   pinMode(DIGITAL_PIN, INPUT_PULLUP);
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
