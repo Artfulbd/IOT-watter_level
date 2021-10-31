@@ -62,8 +62,8 @@ void loop()
   client.print(s);
   if (req.indexOf(resource) != -1)
   {
-    doc["test1"] = lowerTankDistanceCm();
-    doc["test2"] = lowerTankDistanceCm();
+    doc["upper"] = lowerTankDistanceCm();
+    doc["lower"] = lowerTankDistanceCm();
     serializeJson(doc, client);
   }
   else{
