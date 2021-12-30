@@ -1,7 +1,7 @@
 # IOT-watter_level
 Wireless Communication between two node MCU with display and some sensors like IR and ultrasonic to measure water depth.
 
-*problem: In my home, drinking water has to be reserved manually (ing on and off the water pump. This process wastes water, as sometimes there is no one to turn off the pump while the water tank is full. Sometimes tank gets empty at some unusual time. So, to tackle those issues, I designed an automated system with minimal cost and modification of the existing process.
+*problem: In my home, drinking water has to be reserved manually (human interaction) by turning on and off the water pump. This process wastes water, as sometimes there is no one to turn off the pump while the water tank is full. Sometimes tank gets empty at some unusual time. So, to tackle those issues, I designed an automated system with minimal cost and modification of the existing process.
 
  * Hardwares
   a. ESP32
